@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthManager;
+use App\Http\Controllers\TaskManager;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,7 +14,28 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::middleware("auth")->group( function(){
+Route::get('/',[TaskManager::class, "getAll"])->name("home");
+});
+Route::get("login", [AuthManager::class, "login"])->name("login");
 
-Route::get('/', function () {
-    return view('welcome');
+Route::post("login", [AuthManager::class, "loginPost"])->name("login.post");
+
+Route::get("register", [AuthManager::class, "register"])->name("register");
+
+Route::post("register", [AuthManager::class, "registerPost"])->name("register.post");
+/*
+Route::group([
+    'middleware' => 'auth',
+    'prefix' => 'tasks'
+], function () {
+  */
+Route::middleware("auth")->prefix("tasks")->name("tasks.")->group( function(){
+    Route::get("/", [TaskManager::class, "create"])->name("create");
+
+    Route::post("create", [TaskManager::class, "createPost"])->name("create.post");
+
+    Route::post("status", [TaskManager::class, "taskUpdateStatus"])->name("update.status");
+
+    Route::post("delete", [TaskManager::class, "taskDelete"])->name("delete");
 });
